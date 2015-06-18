@@ -12,7 +12,7 @@ broccoli-build-helper build destination --environment=(development|production)
 broccoli-build-helper build --output=destination --environment=(development|production) --watch
 ```
 
---watch uses the `broccoli-sane-watcher` watcher to look for change in your project root.
+--watch uses the `broccoli-sane-watcher` watcher to look for changes in your project root.
 
 ## License
 
