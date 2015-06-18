@@ -1,0 +1,39 @@
+{
+  "name": "broccoli-build-helper",
+  "version": "0.1.0",
+  "description": "Broccoli - Command line application to build, watch (live rebuild) and set broccoli environment.",
+  "main": "index.js",
+  "author": {
+    "name": "Arnaud PEZEL"
+  },
+  "license": "MIT",
+  "preferGlobal": true,
+  "repository": {
+    "type": "git",
+    "url": "https://github.com/apezel/broccoli-build-helper.git"
+  },
+  "bin": {
+    "broccoli-build-helper": "./index.js"
+  },
+  "keywords": [
+    "broccoli-plugin",
+    "javascript",
+    "broccoli watch",
+    "sane"
+  ],
+  "dependencies": {
+    "broccoli-kitchen-sink-helpers": "~0.2.5",
+    "broccoli-sane-watcher": "1.1.1",
+    "minimist": "1.1.1",
+    "rimraf": "~2.2.8",
+    "chalk": "~0.5.1",
+    "broccoli": "~0.13.3"
+  },
+  "homepage": "https://github.com/apezel/broccoli-build-helper",
+  "maintainers": [
+    {
+      "name": "apezel",
+      "email": "arnaud@apyx.fr"
+    }
+  ]
+}
