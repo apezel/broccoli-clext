@@ -6,10 +6,10 @@ Command line utility to build, watch et set your broccoli environment. This proj
 
 ```bash
 npm install -g broccoli-build-helper
-build destination
-build destination --environment=(development|production)
-build destination --environment=(development|production) --watch
-build --output=destination --environment=(development|production) --watch
+broccoli-build-helper build destination
+broccoli-build-helper build destination --environment=(development|production)
+broccoli-build-helper build destination --environment=(development|production) --watch
+broccoli-build-helper build --output=destination --environment=(development|production) --watch
 ```
 
 --watch uses the `broccoli-sane-watcher` watcher to look for change in your project root.
