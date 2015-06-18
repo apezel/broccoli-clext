@@ -7,8 +7,8 @@ Command line utility to build, watch et set your broccoli environment. This proj
 ```bash
 npm install -g broccoli-build-helper
 broccoli-build-helper build destination
+broccoli-build-helper build destination --watch
 broccoli-build-helper build destination --environment=(development|production)
-broccoli-build-helper build destination --environment=(development|production) --watch
 broccoli-build-helper build --output=destination --environment=(development|production) --watch
 ```
 
