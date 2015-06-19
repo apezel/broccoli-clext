@@ -1,7 +1,7 @@
 {
-  "name": "broccoli-build-helper",
+  "name": "broccoli-clext",
   "version": "0.1.0",
-  "description": "Broccoli - Command line application to build, watch (live rebuild) and set broccoli environment.",
+  "description": "Broccoli command line extension. Build, watch (live rebuild) and set broccoli environment.",
   "main": "index.js",
   "author": {
     "name": "Arnaud PEZEL"
@@ -10,17 +10,20 @@
   "preferGlobal": true,
   "repository": {
     "type": "git",
-    "url": "https://github.com/apezel/broccoli-build-helper.git"
+    "url": "https://github.com/apezel/broccoli-clext.git"
   },
+    
   "bin": {
-    "broccoli-build-helper": "./index.js"
+    "broccoli-clext": "./index.js"
   },
+    
   "keywords": [
     "broccoli-plugin",
     "javascript",
     "broccoli watch",
     "sane"
   ],
+    
   "dependencies": {
     "broccoli-kitchen-sink-helpers": "~0.2.5",
     "broccoli-sane-watcher": "1.1.1",
@@ -29,7 +32,8 @@
     "chalk": "~0.5.1",
     "broccoli": "~0.13.3"
   },
-  "homepage": "https://github.com/apezel/broccoli-build-helper",
+    
+  "homepage": "https://github.com/apezel/broccoli-clext",
   "maintainers": [
     {
       "name": "apezel",
