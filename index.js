@@ -81,9 +81,11 @@ function run(args) {
             if(args.rimraf) {
                 rimraf.sync(destDir);
             } else {
+              // just make sure the files we want to copy over are deleted in destDir
               var files = glob.sync(path.join(results.directory, '**/*'), { nodir: true });
               files.forEach(function(file) {
-                fs.unlinkSync(file);
+                var destFile = path.join(destDir, path.relative(results.directory, file));
+                fs.unlinkSync(destFile);
               });
             }
 
