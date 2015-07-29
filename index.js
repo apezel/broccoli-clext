@@ -85,7 +85,15 @@ function run(args) {
               var files = glob.sync(path.join(results.directory, '**/*'), { nodir: true });
               files.forEach(function(file) {
                 var destFile = path.join(destDir, path.relative(results.directory, file));
-                fs.unlinkSync(destFile);
+
+                // makes sure the full build also works even if the file to delete does not exist
+                try {
+                  fs.unlinkSync(destFile);
+                } catch (error) {
+                  if (error.code !== 'ENOENT') {
+                    throw error;
+                  }
+                }
               });
             }
 
