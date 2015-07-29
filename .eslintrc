@@ -1,0 +1,9 @@
+{
+  "rules": {
+    "quotes": [2, "single", "avoid-escape"],
+    "no-process-exit": 0
+  },
+  "env": {
+    "node": true
+  }
+}
