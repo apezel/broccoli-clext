@@ -7,12 +7,14 @@ Command line utility to build, watch et set your broccoli environment. This proj
 ```bash
 npm install -g broccoli-clext
 broccoli-clext build destination
-broccoli-clext build destination --watch
+broccoli-clext build destination
 broccoli-clext build destination --environment=(development|production)
-broccoli-clext build --output=destination --environment=(development|production) --watch
+broccoli-clext build --output=destination --environment=(development|production) --once
+broccoli-clext build --clean
 ```
 
---watch uses `broccoli-sane-watcher` to look for changes in your project.
+Watching for changes is the default behavior and broccoli-clext uses `broccoli-sane-watcher` to do that.
+Use --once if you only want to disable the watch feature.
 
 ## License
 

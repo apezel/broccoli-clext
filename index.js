@@ -13,6 +13,7 @@ var glob = require('glob');
 var PleasantProgress = require('pleasant-progress');
 
 function run(args) {
+    
   var pleasantProgress = new PleasantProgress();
   pleasantProgress.start(chalk.yellow('Building'));
 
@@ -62,7 +63,7 @@ function run(args) {
     };
 
 
-    if (args.noWwatch) {
+    if (args.once) {
 
         builder.build()
             .then(onSuccess, onError);
@@ -78,7 +79,7 @@ function run(args) {
 
         watcher.on('change', function (results) {
 
-            if(args.rimraf) {
+            if(args.clean) {
                 rimraf.sync(destDir);
             } else {
               // just make sure the files we want to copy over are deleted in destDir
