@@ -115,9 +115,9 @@ if (!(argv._[0] === 'build' && (argv._.length === 2 || (argv._.length === 1 && a
 
     console.log('Usage : build destination');
     console.log('Usage : build destination --environment=(development|production)');
-    console.log('Usage : build destination --environment=(development|production) --no-watch');
-    console.log('Usage : build --output=destination --environment=(development|production) --no-watch');
-    console.log('Usage : build --output=destination --rimraf');
+    console.log('Usage : build destination --environment=(development|production)');
+    console.log('Usage : build --output=destination --environment=(development|production) --once');
+    console.log('Usage : build --output=destination --clean');
     process.exit(1);
 }
 
