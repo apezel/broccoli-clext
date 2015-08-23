@@ -1,26 +1,29 @@
 #!/usr/bin/env node
+'use strict';
 
 var fs = require('fs');
 var path = require('path');
 var chalk = require('chalk');
 var rimraf = require('rimraf');
-var helpers = require('broccoli-kitchen-sink-helpers');
-var SWatcher = require('broccoli-sane-watcher/index');
+var copyDereference = require('ember-cli-copy-dereference').sync;
+var SWatcher = require('broccoli-sane-watcher');
 var broccoli = require('broccoli');
 var argv = require('minimist')(process.argv.slice(2));
+var glob = require('glob');
+var PleasantProgress = require('pleasant-progress');
 
 function run(args) {
-    
-    var command = args._[0];
-    
+  var pleasantProgress = new PleasantProgress();
+  pleasantProgress.start(chalk.yellow('Building'));
+
     /* ENVIRONMENT */
     if (args.environment) {
-        
-        process.env['BROCCOLI_ENV'] = args.environment;
-        
+
+        process.env.BROCCOLI_ENV = args.environment;
+
     }
 
-    
+
     var tree = broccoli.loadBrocfile();
     var builder = new broccoli.Builder(tree);
 
@@ -32,18 +35,20 @@ function run(args) {
                 process.exit(1);
             });
     };
-    
+
     process.on('SIGINT', atExit);
     process.on('SIGTERM', atExit);
-    
+
     var onSuccess = function(res) {
-        
-        console.log(chalk.bold.green("Build successful - " + Math.floor(res.totalTime / 1e6) + 'ms'));
-        
-    }
-    
+
+        pleasantProgress.stop();
+        console.log(chalk.bold.green('Build successful - ' + Math.floor(res.totalTime / 1e6) + 'ms'));
+
+    };
+
     var onError = function(err) {
-        
+
+        pleasantProgress.stop();
         console.log(chalk.bold.red(err + '\n\nBuild failed.\n'));
 
         if (err.message) {
@@ -51,46 +56,67 @@ function run(args) {
         }
 
         if (err.stack) {
-            console.log('Stack trace:\n' + err.stack.replace(/(^.)/mg, "  $1"));
+            console.log('Stack trace:\n' + err.stack.replace(/(^.)/mg, '  $1'));
         }
-        
-    }
 
-    
-    if (args.watch) {
-        
+    };
+
+
+    if (args.noWwatch) {
+
+        builder.build()
+            .then(onSuccess, onError);
+
+    } else {
+
         var watcher = new SWatcher(builder, {
+            watchman: true,
+            verbose: true,
             debounce: args.debounce || 100,
             filter: function(name) { return /^([^\.]|node_modules)/.test(name); }
         });
 
         watcher.on('change', function (results) {
 
-            rimraf.sync(destDir);
-            helpers.copyRecursivelySync(results.directory, destDir);
+            if(args.rimraf) {
+                rimraf.sync(destDir);
+            } else {
+              // just make sure the files we want to copy over are deleted in destDir
+              var files = glob.sync(path.join(results.directory, '**/*'), { nodir: true });
+              files.forEach(function(file) {
+                var destFile = path.join(destDir, path.relative(results.directory, file));
+
+                // makes sure the full build also works even if the file to delete does not exist
+                try {
+                  fs.unlinkSync(destFile);
+                } catch (error) {
+                  if (error.code !== 'ENOENT') {
+                    throw error;
+                  }
+                }
+              });
+            }
+
+            copyDereference(results.directory, destDir);
 
             onSuccess(results);
-            
+
         });
 
         watcher.on('error', onError);
 
         return watcher;
-        
-    } else {
-        
-        builder.build()
-            .then(onSuccess,onError);
-        
+
     }
 }
 
-if (!(argv._[0] === "build" && (argv._.length === 2 || (argv._.length === 1 && argv.output)))) {
-    
-    console.log("Usage : build destination");
-    console.log("Usage : build destination --environment=(development|production)");
-    console.log("Usage : build destination --environment=(development|production) --watch");
-    console.log("Usage : build --output=destination --environment=(development|production) --watch");
+if (!(argv._[0] === 'build' && (argv._.length === 2 || (argv._.length === 1 && argv.output)))) {
+
+    console.log('Usage : build destination');
+    console.log('Usage : build destination --environment=(development|production)');
+    console.log('Usage : build destination --environment=(development|production) --no-watch');
+    console.log('Usage : build --output=destination --environment=(development|production) --no-watch');
+    console.log('Usage : build --output=destination --rimraf');
     process.exit(1);
 }
 

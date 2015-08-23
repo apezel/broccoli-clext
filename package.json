@@ -12,32 +12,35 @@
     "type": "git",
     "url": "https://github.com/apezel/broccoli-clext.git"
   },
-    
   "bin": {
     "broccoli-clext": "./index.js"
   },
-    
   "keywords": [
     "broccoli-plugin",
     "javascript",
     "broccoli watch",
-    "sane"
+    "sane",
+    "broccoli",
+    "watchman"
   ],
-    
   "dependencies": {
-    "broccoli-kitchen-sink-helpers": "~0.2.5",
-    "broccoli-sane-watcher": "1.1.1",
-    "minimist": "1.1.1",
-    "rimraf": "~2.2.8",
-    "chalk": "~0.5.1",
-    "broccoli": "~0.13.3"
+    "broccoli": "^0.16.5",
+    "broccoli-sane-watcher": "^1.1.1",
+    "chalk": "^1.1.0",
+    "ember-cli-copy-dereference": "^1.0.0",
+    "glob": "^5.0.14",
+    "minimist": "^1.1.2",
+    "pleasant-progress": "^1.1.0",
+    "rimraf": "^2.4.2"
   },
-    
   "homepage": "https://github.com/apezel/broccoli-clext",
   "maintainers": [
     {
       "name": "apezel",
       "email": "arnaud@apyx.fr"
     }
-  ]
+  ],
+  "devDependencies": {
+    "eslint": "^0.24.1"
+  }
 }
