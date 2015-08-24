@@ -5,7 +5,7 @@ var fs = require('fs');
 var path = require('path');
 var chalk = require('chalk');
 var rimraf = require('rimraf');
-var copyDereference = require('ember-cli-copy-dereference').sync;
+var copyDereference = require('copy-dereference').sync;
 var SWatcher = require('broccoli-sane-watcher');
 var broccoli = require('broccoli');
 var argv = require('minimist')(process.argv.slice(2));
@@ -23,7 +23,6 @@ function run(args) {
         process.env.BROCCOLI_ENV = args.environment;
 
     }
-
 
     var tree = broccoli.loadBrocfile();
     var builder = new broccoli.Builder(tree);
@@ -63,18 +62,13 @@ function run(args) {
     };
 
 
-    if (args.once) {
-
-        builder.build()
-            .then(onSuccess, onError);
-
-    } else {
+    if (!args.once) {
 
         var watcher = new SWatcher(builder, {
-            watchman: true,
+            glob: ['!tmp/**'],
+            watchman: !args.noWatchman,
             verbose: true,
-            debounce: args.debounce || 100,
-            filter: function(name) { return /^([^\.]|node_modules)/.test(name); }
+            debounce: args.debounce || 100
         });
 
         watcher.on('change', function (results) {
@@ -84,23 +78,28 @@ function run(args) {
             } else {
               // just make sure the files we want to copy over are deleted in destDir
               var files = glob.sync(path.join(results.directory, '**/*'), { nodir: true });
-              files.forEach(function(file) {
-                var destFile = path.join(destDir, path.relative(results.directory, file));
-
-                // makes sure the full build also works even if the file to delete does not exist
-                try {
-                  fs.unlinkSync(destFile);
-                } catch (error) {
-                  if (error.code !== 'ENOENT') {
-                    throw error;
-                  }
-                }
-              });
+              
+                files.forEach(function(file) {
+                    
+                    var destFile = path.join(destDir, path.relative(results.directory, file));
+    
+                    // makes sure the full build also works even if the file to delete does not exist
+                    try {
+                        fs.unlinkSync(destFile);
+                    } catch (error) {
+                        if (error.code !== 'ENOENT') {
+                            throw error;
+                        }
+                    }
+                    
+                    copyDereference(file, destFile);
+              
+                });
+                
             }
 
-            copyDereference(results.directory, destDir);
-
             onSuccess(results);
+            
 
         });
 
@@ -109,6 +108,10 @@ function run(args) {
         return watcher;
 
     }
+    
+     builder.build()
+            .then(onSuccess, onError);
+    
 }
 
 if (!(argv._[0] === 'build' && (argv._.length === 2 || (argv._.length === 1 && argv.output)))) {
@@ -118,6 +121,7 @@ if (!(argv._[0] === 'build' && (argv._.length === 2 || (argv._.length === 1 && a
     console.log('Usage : build destination --environment=(development|production)');
     console.log('Usage : build --output=destination --environment=(development|production) --once');
     console.log('Usage : build --output=destination --clean');
+    console.log('Usage : build --no-watchman');
     process.exit(1);
 }
 
