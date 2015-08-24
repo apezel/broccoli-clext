@@ -1,6 +1,6 @@
 {
   "name": "broccoli-clext",
-  "version": "0.2",
+  "version": "0.2.0",
   "description": "Broccoli command line extension. Build, watch (live rebuild) and set broccoli environment.",
   "main": "index.js",
   "author": {
