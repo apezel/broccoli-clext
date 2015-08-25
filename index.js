@@ -11,6 +11,8 @@ var broccoli = require('broccoli');
 var argv = require('minimist')(process.argv.slice(2));
 var glob = require('glob');
 var PleasantProgress = require('pleasant-progress');
+var mkdirp = require('mkdirp');
+var minimatch = require('minimatch');
 
 function run(args) {
     
@@ -27,7 +29,7 @@ function run(args) {
     var tree = broccoli.loadBrocfile();
     var builder = new broccoli.Builder(tree);
 
-    var destDir = args.output || args._[1];
+    var destDir = args.output || (args.length === 2 ? args._[1]:"dist");
 
     var atExit = function () {
         builder.cleanup()
@@ -60,44 +62,66 @@ function run(args) {
         }
 
     };
+    
+    //First build
+    builder.build().then(onSuccess, onError);
 
     if (!args.once) {
 
         var watcher = new SWatcher(builder, {
-            glob: ['!tmp/**'],
             watchman: args.watchman == null || args.watchman,
             verbose: true,
-            debounce: args.debounce || 100
+            debounce: args.debounce || 300,
+            filter: function(name, filePath, root) {
+                
+                var f = true,
+                    excludes = ['tmp/**', path.normalize(destDir)+'/**'];
+                
+                if (args.exclude) {
+                    
+                    excludes = excludes.concat(!(args.exclude instanceof Array) ? [args.exclude]:args.exclude);
+                    
+                }
+                
+                excludes.forEach(function(exclude) {
+                    
+                    f = f && !minimatch(path.join(root, filePath), process.cwd()+'/'+exclude);
+                        
+                });
+                
+                return f;
+                
+            }
         });
 
         watcher.on('change', function (results) {
-
-            if(args.clean) {
+            
+            if (args.clean) {
                 
                 rimraf.sync(destDir);
                 
-            } else {
-              // just make sure the files we want to copy over are deleted in destDir
-              var files = glob.sync(path.join(results.directory, '**/*'), { nodir: true });
-              
-                files.forEach(function(file) {
-                    
-                    var destFile = path.join(destDir, path.relative(results.directory, file));
-    
-                    // makes sure the full build also works even if the file to delete does not exist
-                    try {
-                        fs.unlinkSync(destFile);
-                    } catch (error) {
-                        if (error.code !== 'ENOENT') {
-                            throw error;
-                        }
-                    }
-                    
-                    copyDereference(file, destFile);
-              
-                });
-                
             }
+            
+            // just make sure the files we want to copy over are deleted in destDir
+            var files = glob.sync(path.join(results.directory, '**/*'), { nodir: true });
+
+            files.forEach(function(file) {
+
+                var destFile = path.join(destDir, path.relative(results.directory, file));
+
+                // makes sure the full build also works even if the file to delete does not exist
+                try {
+                    fs.unlinkSync(destFile);
+                } catch (error) {
+                    if (error.code !== 'ENOENT') {
+                        throw error;
+                    }
+                }
+                
+                copy(file, destFile);
+
+            });
+                
 
             onSuccess(results);
             
@@ -109,20 +133,26 @@ function run(args) {
 
     }
     
-    //First build
     
-    builder.build().then(onSuccess, onError);
     
 }
 
-if (!(argv._[0] === 'build' && (argv._.length === 2 || (argv._.length === 1 && argv.output)))) {
+function copy(source, dest) {
+    
+    mkdirp(path.parse(dest).dir, function(err) { if (!err) copyDereference(source, dest); });
+    
+};
 
+if (!(argv._[0] === 'build') || argv._[0] === 'help') {
+
+    console.log('Usage : build');
     console.log('Usage : build destination');
     console.log('Usage : build destination --environment=(development|production)');
     console.log('Usage : build destination --environment=(development|production)');
     console.log('Usage : build --output=destination --environment=(development|production) --once');
     console.log('Usage : build --output=destination --clean');
     console.log('Usage : build --no-watchman');
+    console.log('Usage : build --exclude \'dir1/**\' --exclude \'dir2/**\'');
     process.exit(1);
 }
 
