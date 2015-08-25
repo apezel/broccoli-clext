@@ -43,8 +43,6 @@ function run(args) {
 
     var onSuccess = function(res) {
         
-        console.log(res);
-
         pleasantProgress.stop();
         console.log(chalk.bold.green('\nBuild successful - ' + Math.floor(res.totalTime / 1e6) + 'ms'));
 
