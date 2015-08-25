@@ -42,6 +42,8 @@ function run(args) {
     process.on('SIGTERM', atExit);
 
     var onSuccess = function(res) {
+        
+        console.log(res);
 
         pleasantProgress.stop();
         console.log(chalk.bold.green('\nBuild successful - ' + Math.floor(res.totalTime / 1e6) + 'ms'));
@@ -63,8 +65,42 @@ function run(args) {
 
     };
     
-    //First build
-    builder.build().then(onSuccess, onError);
+    var onBuild = function(results) {
+        
+        if (args.clean) {
+
+            rimraf.sync(destDir);
+
+        }
+
+        // just make sure the files we want to copy over are deleted in destDir
+        var files = glob.sync(path.join(results.directory, '**/*'), { nodir: true });
+
+        files.forEach(function(file) {
+            
+            var destFile = path.join(destDir, path.relative(results.directory, file));
+
+            // makes sure the full build also works even if the file to delete does not exist
+            try {
+                
+                fs.unlinkSync(destFile);
+            
+            } catch (error) {
+            
+                if (error.code !== 'ENOENT') {
+                    throw error;
+                }
+            
+            }
+
+            copy(file, destFile);
+
+        });
+
+
+        onSuccess(results);
+        
+    };
 
     if (!args.once) {
 
@@ -94,46 +130,16 @@ function run(args) {
             }
         });
 
-        watcher.on('change', function (results) {
-            
-            if (args.clean) {
-                
-                rimraf.sync(destDir);
-                
-            }
-            
-            // just make sure the files we want to copy over are deleted in destDir
-            var files = glob.sync(path.join(results.directory, '**/*'), { nodir: true });
-
-            files.forEach(function(file) {
-
-                var destFile = path.join(destDir, path.relative(results.directory, file));
-
-                // makes sure the full build also works even if the file to delete does not exist
-                try {
-                    fs.unlinkSync(destFile);
-                } catch (error) {
-                    if (error.code !== 'ENOENT') {
-                        throw error;
-                    }
-                }
-                
-                copy(file, destFile);
-
-            });
-                
-
-            onSuccess(results);
-            
-        });
-
+        watcher.on('change', onBuild);
         watcher.on('error', onError);
 
         return watcher;
 
+    } else {
+        
+        builder.build().then(onBuild, onError);
+        
     }
-    
-    
     
 }
 
