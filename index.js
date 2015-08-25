@@ -86,7 +86,9 @@ function run(args) {
             } catch (error) {
             
                 if (error.code !== 'ENOENT') {
+                    
                     throw error;
+                    
                 }
             
             }
