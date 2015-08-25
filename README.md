@@ -19,7 +19,9 @@ Watching for changes is the default behavior and broccoli-clext uses `broccoli-s
 Options :
 
 --once if you only want to disable the watch feature.
+
 --no-watchman do disable wathcman and use poll.
+
 --clean to use rimraf
 
 
