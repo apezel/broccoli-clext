@@ -15,7 +15,7 @@ var PleasantProgress = require('pleasant-progress');
 function run(args) {
     
   var pleasantProgress = new PleasantProgress();
-  pleasantProgress.start(chalk.yellow('Building'));
+  pleasantProgress.start(chalk.blue('Building'));
 
     /* ENVIRONMENT */
     if (args.environment) {
@@ -42,7 +42,7 @@ function run(args) {
     var onSuccess = function(res) {
 
         pleasantProgress.stop();
-        console.log(chalk.bold.green('Build successful - ' + Math.floor(res.totalTime / 1e6) + 'ms'));
+        console.log(chalk.bold.green('\nBuild successful - ' + Math.floor(res.totalTime / 1e6) + 'ms'));
 
     };
 
@@ -61,12 +61,11 @@ function run(args) {
 
     };
 
-
     if (!args.once) {
 
         var watcher = new SWatcher(builder, {
             glob: ['!tmp/**'],
-            watchman: !args.noWatchman,
+            watchman: args.watchman == null || args.watchman,
             verbose: true,
             debounce: args.debounce || 100
         });
@@ -74,7 +73,9 @@ function run(args) {
         watcher.on('change', function (results) {
 
             if(args.clean) {
+                
                 rimraf.sync(destDir);
+                
             } else {
               // just make sure the files we want to copy over are deleted in destDir
               var files = glob.sync(path.join(results.directory, '**/*'), { nodir: true });
@@ -100,7 +101,6 @@ function run(args) {
 
             onSuccess(results);
             
-
         });
 
         watcher.on('error', onError);
@@ -109,8 +109,9 @@ function run(args) {
 
     }
     
-     builder.build()
-            .then(onSuccess, onError);
+    //First build
+    
+    builder.build().then(onSuccess, onError);
     
 }
 
