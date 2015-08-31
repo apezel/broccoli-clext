@@ -16,8 +16,15 @@ var minimatch = require('minimatch');
 
 function run(args) {
     
-  var pleasantProgress = new PleasantProgress();
-  pleasantProgress.start(chalk.blue('Building'));
+    var HotCSS;
+    if (args['hot-css']) {
+
+        HotCSS = require('./lib/hot-css-server');
+
+    }
+    
+    var pleasantProgress = new PleasantProgress();
+    pleasantProgress.start(chalk.blue('Building'));
 
     /* ENVIRONMENT */
     if (args.environment) {
@@ -94,9 +101,14 @@ function run(args) {
             }
 
             copy(file, destFile);
+            
+            if (HotCSS && /\.css$/.test(file)) {
+ 
+               HotCSS.broadcast("reload:"+path.basename(file)); 
+
+            }
 
         });
-
 
         onSuccess(results);
         
@@ -140,6 +152,7 @@ function run(args) {
         builder.build().then(onBuild, onError);
         
     }
+   
     
 }
 
@@ -163,3 +176,5 @@ if (!(argv._[0] === 'build') || argv._[0] === 'help') {
 }
 
 run(argv);
+
+

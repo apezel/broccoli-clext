@@ -1,6 +1,6 @@
 {
   "name": "broccoli-clext",
-  "version": "0.3.2",
+  "version": "0.3.3",
   "description": "Broccoli command line extension. Build, watch (live rebuild) and set broccoli environment.",
   "main": "index.js",
   "author": {
@@ -24,16 +24,17 @@
     "watchman"
   ],
   "dependencies": {
+    "broccoli": "^0.16.5",
     "broccoli-sane-watcher": "https://github.com/apezel/broccoli-sane-watcher.git",
     "chalk": "^1.1.0",
     "copy-dereference": "^1.0.0",
     "glob": "^5.0.14",
+    "minimatch": "2.0.9",
     "minimist": "^1.1.2",
+    "mkdirp": "0.5.1",
     "pleasant-progress": "^1.1.0",
     "rimraf": "^2.4.2",
-    "mkdirp": "0.5.1",
-    "minimatch": "2.0.9",
-    "broccoli": "^0.16.5"
+    "ws": "^0.8.0"
   },
   "homepage": "https://github.com/apezel/broccoli-clext",
   "maintainers": [
