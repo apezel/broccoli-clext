@@ -28,8 +28,8 @@ function run(args) {
 
     var tree = broccoli.loadBrocfile();
     var builder = new broccoli.Builder(tree);
-
-    var destDir = args.output || (args.length === 2 ? args._[1]:"dist");
+    
+    var destDir = args.output || (args._.length === 2 ? argv._[1]:"dist");
 
     var atExit = function () {
         builder.cleanup()
