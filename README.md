@@ -26,6 +26,8 @@ Options :
 
 --clean to use rimraf. If not used, files are merged.
 
+--hot-css (experimental and not fully implemented). You need to import lib/hot-css-client.js into your project or html file.
+
 v0.3
 ----
 

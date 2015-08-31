@@ -172,6 +172,7 @@ if (!(argv._[0] === 'build') || argv._[0] === 'help') {
     console.log('Usage : build --output=destination --clean');
     console.log('Usage : build --no-watchman');
     console.log('Usage : build --exclude \'dir1/**\' --exclude \'dir2/**\'');
+    console.log('Usage : build --hot-css');
     process.exit(1);
 }
 
