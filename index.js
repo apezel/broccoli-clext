@@ -17,25 +17,43 @@ var RSVP = require('rsvp');
 
 function run(args) {
     
-    var HotCSS;
-    if (args['hot-css']) {
-
-        HotCSS = require('./lib/hot-css-server');
-
-    }
+    /*
+     ENVIRONMENT
+    */
     
-    var pleasantProgress = new PleasantProgress();
-    pleasantProgress.start(chalk.blue('Building'));
-
-    /* ENVIRONMENT */
     if (args.environment) {
 
         process.env.BROCCOLI_ENV = args.environment;
 
     }
+    
+    /*
+     PLUGINS
+    */
+    
+    var plugins = [];
+    
+    if (args['hot-css']) {
+        
+        var HotCSS = require('./lib/hot-css/index');
+        plugins.push(new HotCSS({port: args['hot-css-port']}));
+
+    }
+    
+    var pleasantProgress = new PleasantProgress();
+    pleasantProgress.start(chalk.blue('Building'));
+    
+    
+    /*
+     TREE
+    */
 
     var tree = broccoli.loadBrocfile();
+    
+    plugins.forEach(function(p) { tree = p.modifyTree(tree); });
+    
     var builder = new broccoli.Builder(tree);
+    
     
     var destDir = args.output || (args._.length === 2 ? argv._[1]:"dist");
 
@@ -51,9 +69,7 @@ function run(args) {
 
     var onSuccess = function(res) {
         
-        if (HotCSS) {
-           HotCSS.broadcast("build-success:true"); 
-        }
+        plugins.forEach(function(p) { p.onBuildSuccess(res); });
         
         pleasantProgress.stop();
         console.log(chalk.bold.green('\nBuild successful - ' + Math.floor(res.totalTime / 1e6) + 'ms'));
@@ -73,9 +89,7 @@ function run(args) {
             error = err.message+"\n";
         }
         
-        if (HotCSS) {
-           HotCSS.broadcast("build-error:"+error.replace(/\n/g, "<br/>")); 
-        }
+        plugins.forEach(function(p) { p.onBuildError(err); });
         
         console.log(chalk.red(error));
 
@@ -83,13 +97,14 @@ function run(args) {
     
     var onBuild = function(results) {
         
+        plugins.forEach(function(p) { results = p.onBuild(results); });
+        
         if (args.clean) {
 
             rimraf.sync(destDir);
 
         }
 
-        // just make sure the files we want to copy over are deleted in destDir
         var files = glob.sync(path.join(results.directory, '**/*'), { nodir: true }),
             copies = [];
         
@@ -117,12 +132,8 @@ function run(args) {
         });
 
         RSVP.all(copies).then(function(copied) {
-            
-            if (HotCSS) {
- 
-               HotCSS.broadcast(copied.map(function(f) { return "reload:"+path.basename(f); }).join(";")); 
 
-            }
+            plugins.forEach(function(p) { copied = p.postCopy(copied); });
             
             onSuccess(results); 
         
@@ -133,6 +144,7 @@ function run(args) {
     if (!args.once) {
 
         var watcher = new SWatcher(builder, {
+            glob: ['!tmp/**'],
             watchman: args.watchman == null || args.watchman,
             verbose: true,
             debounce: args.debounce || 300,
@@ -156,6 +168,7 @@ function run(args) {
                 return f;
                 
             }
+            
         });
 
         watcher.on('change', onBuild);
