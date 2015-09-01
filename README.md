@@ -22,7 +22,7 @@ Options :
 
 --once if you only want to disable the watch feature.
 
---no-watchman do disable wathcman and use poll.
+--no-watchman do disable wathcman and use fs.watch.
 
 --clean to use rimraf. If not used, files are merged.
 

@@ -34,6 +34,7 @@
     "mkdirp": "0.5.1",
     "pleasant-progress": "^1.1.0",
     "rimraf": "^2.4.2",
+    "rsvp": "^3.1.0",
     "ws": "^0.8.0"
   },
   "homepage": "https://github.com/apezel/broccoli-clext",

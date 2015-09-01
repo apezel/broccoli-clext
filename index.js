@@ -13,6 +13,7 @@ var glob = require('glob');
 var PleasantProgress = require('pleasant-progress');
 var mkdirp = require('mkdirp');
 var minimatch = require('minimatch');
+var RSVP = require('rsvp');
 
 function run(args) {
     
@@ -79,8 +80,9 @@ function run(args) {
         }
 
         // just make sure the files we want to copy over are deleted in destDir
-        var files = glob.sync(path.join(results.directory, '**/*'), { nodir: true });
-
+        var files = glob.sync(path.join(results.directory, '**/*'), { nodir: true }),
+            copies = [];
+        
         files.forEach(function(file) {
             
             var destFile = path.join(destDir, path.relative(results.directory, file));
@@ -94,23 +96,27 @@ function run(args) {
             
                 if (error.code !== 'ENOENT') {
                     
-                    throw error;
+                    console.log("WARNING : "+error);
                     
                 }
             
             }
-
-            copy(file, destFile);
             
-            if (HotCSS && /\.css$/.test(file)) {
- 
-               HotCSS.broadcast("reload:"+path.basename(file)); 
-
-            }
+            copies.push(copy(file, destFile));
 
         });
 
-        onSuccess(results);
+        RSVP.all(copies).then(function(copied) {
+            
+            if (HotCSS) {
+ 
+               HotCSS.broadcast(copied.map(function(f) { return "reload:"+path.basename(f); }).join(";")); 
+
+            }
+            
+            onSuccess(results); 
+        
+        });
         
     };
 
@@ -158,7 +164,24 @@ function run(args) {
 
 function copy(source, dest) {
     
-    mkdirp(path.parse(dest).dir, function(err) { if (!err) copyDereference(source, dest); });
+    return new RSVP.Promise(function(resolve, reject) {
+        
+        mkdirp(path.parse(dest).dir, function(err) {
+            
+            if (!err) {
+                
+                copyDereference(source, dest);
+                resolve(dest); 
+            
+            } else {
+                
+                reject();
+                
+            }
+            
+        });
+        
+    });
     
 };
 
