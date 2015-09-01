@@ -1,10 +1,11 @@
 {
   "name": "broccoli-clext",
   "version": "0.5.0",
-  "description": "Broccoli command line extension. Build, watch (live rebuild) and set broccoli environment.",
+  "description": "Broccoli command line extension. Build, watch (live rebuild) and set broccoli environment. Comes with a hot css replacement plugin.",
   "main": "index.js",
   "author": {
-    "name": "Arnaud PEZEL"
+    "name": "Arnaud PEZEL",
+    "url": "http://www.apyx.fr"
   },
   "license": "MIT",
   "preferGlobal": true,
@@ -25,6 +26,8 @@
   ],
   "dependencies": {
     "broccoli": "^0.16.5",
+    "broccoli-file-creator": "^1.0.0",
+    "broccoli-merge-trees": "^0.2.3",
     "broccoli-sane-watcher": "https://github.com/apezel/broccoli-sane-watcher.git",
     "chalk": "^1.1.0",
     "copy-dereference": "^1.0.0",
