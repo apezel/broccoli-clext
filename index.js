@@ -68,7 +68,7 @@ function run(args) {
         var error = "Unknow error";
         
         if (err.stack) {
-            error = err.stack;
+            error = err.stack+"\n";
         } else if (err.message) {
             error = err.message+"\n";
         }
