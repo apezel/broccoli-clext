@@ -63,23 +63,21 @@ function run(args) {
     var onError = function(err) {
 
         pleasantProgress.stop();
-        console.log(chalk.bold.red(err + '\n\nBuild failed.\n'));
+        console.log(chalk.bold.red('\n\nBuild failed.\n'));
 
-        var err = "Error : ";
+        var error = "Unknow error";
         
-        if (err.message) {
-            error += err.message+"\n";
-        }
-
         if (err.stack) {
-            error += err.stack.replace(/(^.)/mg, '  $1');
+            error = err.stack;
+        } else if (err.message) {
+            error = err.message+"\n";
         }
         
         if (HotCSS) {
-           HotCSS.broadcast("build-error:"+error); 
+           HotCSS.broadcast("build-error:"+error.replace(/\n/g, "<br/>")); 
         }
         
-        console.log(chalk.bold.red(error));
+        console.log(chalk.red(error));
 
     };
     
