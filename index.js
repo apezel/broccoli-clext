@@ -51,6 +51,10 @@ function run(args) {
 
     var onSuccess = function(res) {
         
+        if (HotCSS) {
+           HotCSS.broadcast("build-success:true"); 
+        }
+        
         pleasantProgress.stop();
         console.log(chalk.bold.green('\nBuild successful - ' + Math.floor(res.totalTime / 1e6) + 'ms'));
 
@@ -61,13 +65,21 @@ function run(args) {
         pleasantProgress.stop();
         console.log(chalk.bold.red(err + '\n\nBuild failed.\n'));
 
+        var err = "Error : ";
+        
         if (err.message) {
-            console.log('Error: ' + err.message);
+            error += err.message+"\n";
         }
 
         if (err.stack) {
-            console.log('Stack trace:\n' + err.stack.replace(/(^.)/mg, '  $1'));
+            error += err.stack.replace(/(^.)/mg, '  $1');
         }
+        
+        if (HotCSS) {
+           HotCSS.broadcast("build-error:"+error); 
+        }
+        
+        console.log(chalk.bold.red(error));
 
     };
     
