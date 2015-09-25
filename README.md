@@ -1,6 +1,6 @@
 # Broccoli CLExt
 
-Command line utility to build, watch and set your broccoli environment. This project was inspired by `broccoli-timepiece`. CLExt bundle a hot css replacement (No refresh); 
+Command line utility to build, watch and set your broccoli environment. This project was inspired by `broccoli-timepiece`. Comes with a hot css replacement plugin. (No refresh)
 
 ## Usage
 
@@ -38,7 +38,7 @@ Every time you modify a style file (css, sass, less...), hot-css will tell the b
 HotCSS Usage : 
 -------------
 
-Launch Clext with --hot-css argument. It will generate a `hot-css-client.js` file in your build folder. 
+Launch CLExt with --hot-css argument. It will generate a `hot-css-client.js` file in your build folder. 
 Include `<script src="destFolder/hot-css-client.js"></script>` in your page to enable css hot replacement.
 Et voilà !
 
