@@ -105,7 +105,7 @@ function run(args) {
 
         }
 
-        var files = glob.sync(path.join(results.directory, '**/*'), { nodir: true }),
+        var files = glob.sync(path.join(results.directory, '**/**'), { nodir: true }),
             copies = [];
 
         files.forEach(function(file) {
